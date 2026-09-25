@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Products Management - SmartCart Admin{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Products Inventory</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Manage store product catalog, prices, and listings</p>
+        </div>
+        <a href="/admin/add-item" class="bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-md transition-all flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add New Product</span>
+        </a>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <form action="/admin/item-list" method="GET" class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col sm:flex-row gap-3">
+        <div class="flex-1 relative">
+            <input type="text" name="search" placeholder="Search by product name..." value="{{ search }}" 
+                   class="w-full bg-slate-50 text-xs text-slate-800 rounded-xl pl-9 pr-4 py-2 border border-slate-200 focus:outline-none">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        </div>
+        <select name="category" onchange="this.form.submit()" class="bg-slate-50 text-xs text-slate-800 rounded-xl px-3 py-2 border border-slate-200 focus:outline-none">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+                <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-xl">Filter</button>
+    </form>
+
+    <!-- Product Table -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6">
+        {% if products %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase tracking-wider font-semibold">
+                            <th class="py-3 px-4">Image</th>
+                            <th class="py-3 px-4">Product Name</th>
+                            <th class="py-3 px-4">Category</th>
+                            <th class="py-3 px-4">Price</th>
+                            <th class="py-3 px-4">Stock</th>
+                            <th class="py-3 px-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                        {% for p in products %}
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="py-3 px-4">
+                                    <img src="{{ p.image if p.image.startswith('http') else url_for('uploaded_file', filename=p.image) }}" 
+                                         alt="{{ p.name }}" class="w-12 h-12 object-cover rounded-xl border border-slate-200"
+                                         onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'">
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="font-bold text-slate-900 block text-sm">{{ p.name }}</span>
+                                    <span class="text-[10px] text-slate-400 block line-clamp-1 max-w-xs">{{ p.description }}</span>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-brand-50 text-brand-700 uppercase">
+                                        {{ p.category }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 font-extrabold text-slate-900">₹{{ "{:,.0f}".format(p.price) }}</td>
+                                <td class="py-3 px-4">
+                                    <span class="font-bold text-slate-700">{{ p.stock_quantity or 50 }}</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="/admin/view-item/{{ p.product_id }}" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700" title="View"><i class="fa-solid fa-eye"></i></a>
+                                        <a href="/admin/update-item/{{ p.product_id }}" class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        <a href="/admin/delete-item/{{ p.product_id }}" onclick="return confirm('Are you sure you want to delete this product?');" class="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-xs text-slate-400 py-6 text-center">No products found in inventory.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

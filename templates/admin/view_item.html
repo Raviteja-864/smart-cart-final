@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}View Product #{{ product.product_id }} - SmartCart Admin{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="bg-white rounded-3xl border border-slate-200/80 p-8 shadow-xl space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+                <span class="text-xs font-bold text-brand-600 uppercase">{{ product.category }}</span>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">{{ product.name }}</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/admin/update-item/{{ product.product_id }}" class="bg-brand-600 text-white font-bold text-xs px-4 py-2 rounded-xl">Edit Item</a>
+                <a href="/admin/item-list" class="bg-slate-100 text-slate-700 font-semibold text-xs px-4 py-2 rounded-xl">&larr; Back</a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="bg-slate-100 rounded-2xl overflow-hidden aspect-square border border-slate-200">
+                <img src="{{ product.image if product.image.startswith('http') else url_for('uploaded_file', filename=product.image) }}" 
+                     alt="{{ product.name }}" class="w-full h-full object-cover"
+                     onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'">
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-700">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
+                    <span class="text-slate-400 block font-medium">Pricing Info</span>
+                    <span class="text-2xl font-extrabold text-slate-900">₹{{ "{:,.0f}".format(product.price) }}</span>
+                    {% if product.original_price %}
+                        <span class="text-slate-400 line-through block">MRP: ₹{{ "{:,.0f}".format(product.original_price) }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-1">
+                    <span class="font-bold text-slate-900 block">Stock Level</span>
+                    <p class="text-sm font-bold text-emerald-600">{{ product.stock_quantity or 50 }} units available</p>
+                </div>
+
+                <div class="space-y-1">
+                    <span class="font-bold text-slate-900 block">Badge Tag</span>
+                    <span class="px-3 py-1 rounded-full bg-slate-900 text-white font-bold inline-block">{{ product.badge or 'Popular' }}</span>
+                </div>
+
+                <div class="space-y-1">
+                    <span class="font-bold text-slate-900 block">Full Description</span>
+                    <p class="text-slate-600 leading-relaxed">{{ product.description }}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

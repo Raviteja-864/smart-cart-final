@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Product - SmartCart Admin{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+    <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-10 shadow-xl space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Edit Product Details</h1>
+                <p class="text-xs text-slate-500 mt-1">Update price, inventory, badge, or image for {{ product.name }}</p>
+            </div>
+            <a href="/admin/item-list" class="text-xs font-semibold text-slate-500 hover:text-slate-800">&larr; Back to Catalog</a>
+        </div>
+
+        <form action="/admin/update-item/{{ product.product_id }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Product Title / Name *</label>
+                    <input type="text" name="name" value="{{ product.name }}" required 
+                           class="w-full bg-slate-50 text-sm text-slate-800 rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Category *</label>
+                    <select name="category" required class="w-full bg-slate-50 text-sm text-slate-800 rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="Mobiles" {% if product.category == 'Mobiles' %}selected{% endif %}>Mobiles & Smartphones</option>
+                        <option value="Laptops" {% if product.category == 'Laptops' %}selected{% endif %}>Laptops & Computers</option>
+                        <option value="Audio" {% if product.category == 'Audio' %}selected{% endif %}>Audio & Headphones</option>
+                        <option value="Wearables" {% if product.category == 'Wearables' %}selected{% endif %}>Smartwatches & Wearables</option>
+                        <option value="Footwear" {% if product.category == 'Footwear' %}selected{% endif %}>Shoes & Footwear</option>
+                        <option value="Gaming" {% if product.category == 'Gaming' %}selected{% endif %}>Gaming & Accessories</option>
+                        <option value="Fashion" {% if product.category == 'Fashion' %}selected{% endif %}>Fashion & Lifestyle</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Badge Tag</label>
+                    <select name="badge" class="w-full bg-slate-50 text-sm text-slate-800 rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="Bestseller" {% if product.badge == 'Bestseller' %}selected{% endif %}>Bestseller</option>
+                        <option value="Hot Deal" {% if product.badge == 'Hot Deal' %}selected{% endif %}>Hot Deal</option>
+                        <option value="Trending" {% if product.badge == 'Trending' %}selected{% endif %}>Trending</option>
+                        <option value="New" {% if product.badge == 'New' %}selected{% endif %}>New Arrival</option>
+                        <option value="Top Rated" {% if product.badge == 'Top Rated' %}selected{% endif %}>Top Rated</option>
+                        <option value="Popular" {% if product.badge == 'Popular' %}selected{% endif %}>Popular Choice</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Selling Price (₹) *</label>
+                    <input type="number" step="0.01" name="price" value="{{ product.price }}" required 
+                           class="w-full bg-slate-50 text-sm text-slate-800 rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Original MRP Price (₹)</label>
+                    <input type="number" step="0.01" name="original_price" value="{{ product.original_price or product.price }}" 
+                           class="w-full bg-slate-50 text-sm text-slate-800 rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Stock Quantity</label>
+                    <input type="number" name="stock_quantity" value="{{ product.stock_quantity or 50 }}" 
+                           class="w-full bg-slate-50 text-sm text-slate-800 rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Product Description *</label>
+                    <textarea name="description" rows="4" required 
+                              class="w-full bg-slate-50 text-sm text-slate-800 rounded-xl px-4 py-3 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">{{ product.description }}</textarea>
+                </div>
+
+                <!-- Image Replacement -->
+                <div class="sm:col-span-2 space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <span class="block text-xs font-bold text-slate-900">Current Image Preview & Replacement</span>
+                    
+                    <div class="flex items-center gap-4">
+                        <img src="{{ product.image if product.image.startswith('http') else url_for('uploaded_file', filename=product.image) }}" 
+                             alt="{{ product.name }}" class="w-16 h-16 object-cover rounded-xl border border-slate-200">
+                        <div class="flex-1 space-y-2">
+                            <input type="file" name="image" accept="image/*" class="text-xs text-slate-500">
+                            <input type="url" name="image_url" placeholder="Or paste image URL link" value="{{ product.image if product.image.startswith('http') else '' }}"
+                                   class="w-full bg-white text-xs text-slate-800 rounded-xl px-3 py-2 border border-slate-200">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <button type="submit" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-4 rounded-2xl shadow-xl shadow-brand-500/20 transition-all text-sm">
+                Save & Update Product
+            </button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

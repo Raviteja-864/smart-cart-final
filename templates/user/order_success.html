@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed #{{ order.order_id }} - SmartCart{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <div class="bg-white rounded-3xl border border-slate-200/80 p-8 sm:p-12 shadow-xl space-y-8">
+        
+        <!-- Header Checkmark -->
+        <div class="text-center space-y-3">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto shadow-sm animate-bounce">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                Order Placed Successfully
+            </span>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Thank You For Your Purchase!</h1>
+            <p class="text-xs text-slate-500">Order Reference Number: <strong class="text-slate-900">{{ order.order_number or ('ORD-' ~ order.order_id) }}</strong></p>
+        </div>
+
+        <!-- Tracking Timeline Graphic -->
+        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-4 text-center sm:text-left">Delivery Progress Status</h3>
+            <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                <div class="space-y-1">
+                    <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center mx-auto text-xs">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <span class="font-bold text-slate-900 block text-[11px]">Placed</span>
+                </div>
+                <div class="space-y-1 opacity-50">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold flex items-center justify-center mx-auto text-xs">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    <span class="font-medium text-slate-600 block text-[11px]">Processing</span>
+                </div>
+                <div class="space-y-1 opacity-50">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold flex items-center justify-center mx-auto text-xs">
+                        <i class="fa-solid fa-truck"></i>
+                    </div>
+                    <span class="font-medium text-slate-600 block text-[11px]">Shipped</span>
+                </div>
+                <div class="space-y-1 opacity-50">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold flex items-center justify-center mx-auto text-xs">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <span class="font-medium text-slate-600 block text-[11px]">Delivered</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Details Card -->
+        <div class="space-y-4">
+            <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">Order Items Receipt</h3>
+            <div class="divide-y divide-slate-100">
+                {% for item in order_items %}
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="{{ item.image if item.image.startswith('http') else url_for('uploaded_file', filename=item.image) }}" 
+                                 alt="{{ item.name }}" class="w-12 h-12 object-cover rounded-xl border border-slate-200"
+                                 onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-900">{{ item.name }}</h4>
+                                <span class="text-[11px] text-slate-500">Qty: {{ item.quantity }}</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-extrabold text-slate-900">₹{{ "{:,.0f}".format(item.price * item.quantity) }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Summary & Address Breakdown -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-2xl border border-slate-200">
+            <div>
+                <span class="font-bold text-slate-900 block mb-1">Shipping Address</span>
+                <p class="text-slate-600 leading-relaxed">{{ order.address }}</p>
+            </div>
+            <div>
+                <span class="font-bold text-slate-900 block mb-1">Payment Information</span>
+                <p class="text-slate-600">Method: <strong>{{ order.payment_method }}</strong></p>
+                <p class="text-slate-600">Status: <strong class="text-emerald-600">{{ order.payment_status }}</strong></p>
+                <p class="text-slate-900 font-extrabold mt-1 text-sm">Total: ₹{{ "{:,.0f}".format(order.total_amount) }}</p>
+            </div>
+        </div>
+
+        <!-- Action Links -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-2">
+            <a href="/user/orders" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-bold py-3.5 px-6 rounded-2xl text-center shadow-lg shadow-brand-500/20 transition-all text-xs">
+                View My Orders History
+            </a>
+            <a href="/user/products" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 px-6 rounded-2xl text-center transition-all text-xs">
+                Continue Shopping
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

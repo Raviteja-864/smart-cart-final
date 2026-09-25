@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartCart - Modern Tech & Lifestyle E-Commerce{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f5ff',
+                            100: '#e0ebff',
+                            500: '#4f46e5',
+                            600: '#4338ca',
+                            700: '#3730a3',
+                        },
+                        accent: {
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts Inter & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Sticky Glass Navbar -->
+    <header class="sticky top-0 z-50 glass-nav border-b border-slate-200/80 shadow-sm transition-all">
+        <!-- Top Promo Bar -->
+        <div class="bg-gradient-to-r from-brand-600 via-indigo-600 to-accent-600 text-white text-xs font-medium py-1.5 px-4 text-center tracking-wide">
+            <span class="inline-flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-yellow-300"></i>
+                FLASH SALE: Get 15% OFF on first UPI payment with Razorpay! Use Code: <span class="font-bold underline tracking-wider">SMART15</span>
+            </span>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-4">
+                
+                <!-- Brand Logo -->
+                <a href="/" class="flex items-center gap-2.5 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform duration-200">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-brand-700 to-indigo-600 bg-clip-text text-transparent">SMART<span class="text-brand-600">CART</span></span>
+                        <span class="block text-[10px] font-semibold text-slate-400 tracking-widest uppercase -mt-1">E-Store</span>
+                    </div>
+                </a>
+
+                <!-- Search Input (Desktop) -->
+                <form action="/user/products" method="GET" class="hidden md:flex flex-1 max-w-md relative">
+                    <input type="text" name="search" placeholder="Search smartphones, laptops, audio, shoes..." value="{{ search if search else '' }}"
+                           class="w-full bg-slate-100/90 text-sm text-slate-800 placeholder-slate-400 rounded-full pl-10 pr-24 py-2 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:bg-white transition-all">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <button type="submit" class="absolute right-1 top-1/2 -translate-y-1/2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors">
+                        Search
+                    </button>
+                </form>
+
+                <!-- Navigation Links & Actions -->
+                <div class="flex items-center gap-3 sm:gap-5">
+                    
+                    <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
+                        <a href="/" class="hover:text-brand-600 transition-colors">Home</a>
+                        <a href="/user/products" class="hover:text-brand-600 transition-colors">Shop All</a>
+                        {% if session.get('user_id') %}
+                            <a href="/user/orders" class="hover:text-brand-600 transition-colors">My Orders</a>
+                        {% endif %}
+                        <a href="/admin-dashboard" class="text-slate-500 hover:text-slate-800 text-xs bg-slate-100 px-2.5 py-1 rounded-md transition-colors"><i class="fa-solid fa-lock mr-1"></i>Admin</a>
+                    </nav>
+
+                    <!-- Cart Icon & Badge -->
+                    <a href="/user/cart" class="relative inline-flex items-center p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors">
+                        <i class="fa-solid fa-bag-shopping text-xl"></i>
+                        {% if cart_count > 0 %}
+                            <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm animate-pulse">
+                                {{ cart_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+
+                    <!-- User Account Dropdown / Auth Buttons -->
+                    {% if session.get('user_id') %}
+                        <div class="relative group">
+                            <button class="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-brand-600 p-1.5 rounded-lg transition-colors">
+                                <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-sm border border-brand-200">
+                                    {{ user_name[0].upper() if user_name else 'U' }}
+                                </div>
+                                <span class="hidden sm:inline max-w-[100px] truncate">{{ user_name }}</span>
+                                <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                            </button>
+                            <div class="absolute right-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 hidden group-hover:block transition-all z-50">
+                                <div class="px-4 py-2 border-b border-slate-100">
+                                    <p class="text-xs font-semibold text-slate-900">{{ user_name }}</p>
+                                    <p class="text-[11px] text-slate-400 truncate">{{ session.get('user_email', '') }}</p>
+                                </div>
+                                <a href="/user/orders" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"><i class="fa-solid fa-box text-brand-500"></i> My Orders</a>
+                                <a href="/user-logout" class="flex items-center gap-2 px-4 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="flex items-center gap-2">
+                            <a href="/user-login" class="text-xs font-semibold text-slate-700 hover:text-brand-600 px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors">Sign In</a>
+                            <a href="/user-register" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2 rounded-xl shadow-md shadow-brand-500/20 transition-colors">Register</a>
+                        </div>
+                    {% endif %}
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobileMenuBtn" class="lg:hidden text-slate-700 p-2 rounded-lg hover:bg-slate-100">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div id="mobileMenu" class="hidden lg:hidden bg-white border-b border-slate-200 px-4 py-3 space-y-2">
+            <form action="/user/products" method="GET" class="relative mb-3">
+                <input type="text" name="search" placeholder="Search products..." class="w-full bg-slate-100 text-sm py-2 pl-9 pr-4 rounded-xl border border-slate-200 focus:outline-none">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            </form>
+            <a href="/" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">Home</a>
+            <a href="/user/products" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">Shop Catalog</a>
+            {% if session.get('user_id') %}
+                <a href="/user/orders" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">My Orders</a>
+                <a href="/user-logout" class="block px-3 py-2 rounded-lg text-sm font-semibold text-rose-600 hover:bg-rose-50">Logout</a>
+            {% else %}
+                <a href="/user-login" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">Login</a>
+                <a href="/user-register" class="block px-3 py-2 rounded-lg text-sm font-semibold text-brand-600 hover:bg-brand-50">Register Account</a>
+            {% endif %}
+            <a href="/admin-dashboard" class="block px-3 py-2 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100"><i class="fa-solid fa-lock mr-1"></i> Admin Portal</a>
+        </div>
+    </header>
+
+    <!-- Flash Messages Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="space-y-2">
+                    {% for category, message in messages %}
+                        {% set bg_color = 'bg-emerald-50 border-emerald-200 text-emerald-800' if category in ('success', 'info') else ('bg-amber-50 border-amber-200 text-amber-800' if category == 'warning' else 'bg-rose-50 border-rose-200 text-rose-800') %}
+                        {% set icon_class = 'fa-circle-check text-emerald-500' if category in ('success', 'info') else ('fa-triangle-exclamation text-amber-500' if category == 'warning' else 'fa-circle-xmark text-rose-500') %}
+                        <div class="flex items-center justify-between p-4 rounded-xl border {{ bg_color }} text-sm shadow-sm transition-all">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid {{ icon_class }} text-base"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                            <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-slate-900 text-slate-300 border-t border-slate-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Col 1: About -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+                        <span class="text-lg font-bold text-white tracking-tight">SMART<span class="text-brand-500">CART</span></span>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Your ultimate destination for premium tech, gadgets, mobile phones, and lifestyle essentials with instant Razorpay UPI checkout.
+                    </p>
+                    <div class="flex gap-3 text-slate-400 text-sm pt-2">
+                        <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Quick Links -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100 mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-xs text-slate-400">
+                        <li><a href="/" class="hover:text-white transition-colors">Home Page</a></li>
+                        <li><a href="/user/products" class="hover:text-white transition-colors">Products Catalog</a></li>
+                        <li><a href="/user/cart" class="hover:text-white transition-colors">My Cart</a></li>
+                        <li><a href="/user/orders" class="hover:text-white transition-colors">Track Orders</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Customer Care -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100 mb-4">Customer Support</h3>
+                    <ul class="space-y-2 text-xs text-slate-400">
+                        <li><i class="fa-solid fa-envelope mr-1.5 text-brand-500"></i> support@smartcart.com</li>
+                        <li><i class="fa-solid fa-phone mr-1.5 text-brand-500"></i> +91 98765 43210</li>
+                        <li><i class="fa-solid fa-location-dot mr-1.5 text-brand-500"></i> Tech Park, KPHB Phase 1, Hyderabad</li>
+                        <li><i class="fa-solid fa-shield-halved mr-1.5 text-emerald-500"></i> Razorpay 256-Bit SSL Encrypted</li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Payments & Guarantee -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-100 mb-4">Accepted Payments</h3>
+                    <div class="flex flex-wrap gap-2 text-2xl text-slate-400 mb-4">
+                        <span class="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-xs font-bold text-indigo-400 flex items-center gap-1"><i class="fa-solid fa-qrcode"></i> Razorpay UPI</span>
+                        <span class="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-xs font-bold text-emerald-400">COD</span>
+                        <span class="px-2 py-1 bg-slate-800 rounded border border-slate-700 text-xs font-bold text-sky-400">Cards</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500">
+                        &copy; 2026 SmartCart Inc. All Rights Reserved. Built for speed, security, and exceptional user experience.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobileMenuBtn');
+        const menu = document.getElementById('mobileMenu');
+        if (btn && menu) {
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

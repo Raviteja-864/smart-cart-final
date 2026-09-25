@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartCart - Delivery Address</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<style>
+body{background:#f1f3f6;font-family:Roboto,Arial,sans-serif;}
+.navbar{background:#2874f0!important;}
+.stepper{display:flex;gap:0;justify-content:center;margin:15px 0;}
+.step{flex:1;text-align:center;position:relative;padding:10px 5px;font-size:12px;font-weight:600;}
+.step::after{content:'';position:absolute;top:18px;left:50%;width:100%;height:3px;background:#e0e0e0;z-index:0;}
+.step:last-child::after{display:none;}
+.step .circle{width:28px;height:28px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+.step.done .circle{background:#2874f0;color:white;} .step.active .circle{background:#fb641b;color:white;} .step.pending .circle{background:#e0e0e0;color:#888;}
+.card-box{background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1);}
+.form-control:focus{border-color:#2874f0;box-shadow:0 0 0 .2rem rgba(40,116,240,.15);}
+.btn-orange{background:#fb641b;color:white;font-weight:700;padding:12px;border-radius:4px;}
+.btn-orange:hover{background:#e55a17;color:white;}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark shadow-sm">
+<div class="container">
+<a class="navbar-brand fw-bold" href="/user-dashboard"><i class="bi bi-cart-check-fill"></i> SmartCart</a>
+<span class="text-white small"><i class="bi bi-shield-lock"></i> 100% Secure</span>
+</div>
+</nav>
+
+<div class="container mt-3" style="max-width:900px;">
+
+<!-- CHECKOUT STEPPER -->
+<div class="card-box p-2 px-4">
+<div class="stepper">
+<div class="step done"><div class="circle"><i class="bi bi-check"></i></div>Cart</div>
+<div class="step active"><div class="circle">2</div>Address</div>
+<div class="step pending"><div class="circle">3</div>Payment</div>
+<div class="step pending"><div class="circle"><i class="bi bi-check-lg"></i></div>Confirm</div>
+</div>
+</div>
+
+<div class="row g-3 mt-1">
+<div class="col-lg-8">
+
+<div class="card-box p-4">
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h6 class="fw-bold mb-0 text-primary"><span class="badge bg-primary me-2">2</span> DELIVERY ADDRESS</h6>
+<small class="text-muted">All fields required</small>
+</div>
+
+<form action="/save-address" method="POST" class="needs-validation" novalidate>
+
+<div class="row g-3">
+<div class="col-md-7">
+<label class="form-label small fw-bold">Full Name *</label>
+<input type="text" name="full_name" class="form-control" placeholder="Ex: Rahul Sharma" required>
+</div>
+<div class="col-md-5">
+<label class="form-label small fw-bold">Phone Number *</label>
+<div class="input-group">
+<span class="input-group-text">+91</span>
+<input type="tel" name="phone" class="form-control" placeholder="10-digit mobile" pattern="[0-9]{10}" maxlength="10" required>
+</div>
+</div>
+
+<div class="col-12">
+<label class="form-label small fw-bold">Address (Area & Street) *</label>
+<textarea name="address" class="form-control" rows="3" placeholder="House No, Building, Street, Area, Landmark" required></textarea>
+</div>
+
+<div class="col-md-4">
+<label class="form-label small fw-bold">City *</label>
+<input type="text" name="city" class="form-control" placeholder="Ex: Hyderabad" required>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">State *</label>
+<input list="states" name="state" class="form-control" placeholder="Select State" required>
+<datalist id="states">
+<option value="Telangana"><option value="Andhra Pradesh"><option value="Karnataka"><option value="Maharashtra"><option value="Tamil Nadu"><option value="Delhi"><option value="Kerala"><option value="Gujarat">
+</datalist>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">PIN Code *</label>
+<input type="text" name="pincode" class="form-control" placeholder="500001" pattern="[0-9]{6}" maxlength="6" required>
+</div>
+
+<div class="col-md-6">
+<label class="form-label small fw-bold">Country</label>
+<select name="country" class="form-select" required>
+<option value="India" selected>India</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small fw-bold">Address Type</label>
+<div class="d-flex gap-3 pt-2">
+<div class="form-check"><input class="form-check-input" type="radio" name="addr_type" value="home" checked><label class="form-check-label small">Home</label></div>
+<div class="form-check"><input class="form-check-input" type="radio" name="addr_type" value="work"><label class="form-check-label small">Work</label></div>
+</div>
+</div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+<a href="/user/cart" class="btn btn-outline-secondary px-4">Back to Cart</a>
+<button type="submit" class="btn btn-orange flex-fill"><i class="bi bi-geo-alt-fill"></i> SAVE & DELIVER HERE</button>
+</div>
+
+<div class="alert alert-light small mt-3 mb-0 border"><i class="bi bi-info-circle text-primary"></i> Your order will be delivered to this address. We will call on your phone for confirmation.</div>
+
+</form>
+</div>
+</div>
+
+<div class="col-lg-4">
+<div class="card-box p-3" style="position:sticky;top:80px;">
+<h6 class="fw-bold text-muted small">PRICE DETAILS</h6>
+<hr class="my-2">
+<div class="d-flex justify-content-between small mb-2"><span>Delivery Charges</span><span class="text-success">FREE</span></div>
+<div class="d-flex justify-content-between small mb-2"><span>Secure Packaging</span><span>₹0</span></div>
+<div class="alert alert-success py-2 small mb-2"><i class="bi bi-shield-check"></i> Your personal data is encrypted & secure with us. 256-bit SSL.</div>
+<div class="small text-muted"><i class="bi bi-truck"></i> Express delivery available. Choose address to see ETA.</div>
+</div>
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SmartCart Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<style>
+body{background:#f1f3f6;font-family:Roboto,Arial,sans-serif;}
+.navbar{background:#2874f0!important;}
+.hero{background:linear-gradient(105deg,#2874f0 0%,#052458 100%);color:white;border-radius:14px;}
+.stat-card{border:none;border-radius:12px;}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark sticky-top shadow-sm">
+<div class="container">
+<a class="navbar-brand fw-bold" href="/user-dashboard"><i class="bi bi-bag-check-fill"></i> SmartCart</a>
+<div class="d-flex gap-2">
+<a href="/user/cart" class="btn btn-light btn-sm"><i class="bi bi-cart3"></i> Cart {% if session.get('cart') %}<span class="badge bg-danger">{{ session.cart|length }}</span>{% endif %}</a>
+<a href="/user/my-orders" class="btn btn-warning btn-sm fw-bold">My Orders</a>
+<a href="/user-logout" class="btn btn-outline-light btn-sm">Logout</a>
+</div>
+</div>
+</nav>
+
+<div class="container mt-4">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }} py-2">{{ message }}</div>
+{% endfor %}
+{% endwith %}
+
+<div class="hero p-4 mb-4 shadow-sm">
+<h2 class="fw-bold">Welcome back, {{ user_name }}! 👋</h2>
+<p>Shop 1000+ products at best price</p>
+<a href="/user/products" class="btn btn-light fw-bold">Shop Now</a>
+<a href="/user/my-orders" class="btn btn-outline-light ms-2">My Orders</a>
+</div>
+
+<div class="row g-3">
+<div class="col-md-4">
+<div class="card p-4 shadow-sm border-0 h-100 text-center">
+<i class="bi bi-grid fs-1 text-primary"></i>
+<h6 class="fw-bold mt-2">Browse Products</h6>
+<a href="/user/products" class="btn btn-primary w-100 mt-2">Explore Now</a>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card p-4 shadow-sm border-0 h-100 text-center">
+<i class="bi bi-cart3 fs-1 text-warning"></i>
+<h6 class="fw-bold mt-2">Your Cart</h6>
+<p class="small text-muted">{% if session.get('cart') %}{{ session.cart|length }} items{% else %}Empty{% endif %}</p>
+<a href="/user/cart" class="btn btn-warning fw-bold w-100">View Cart</a>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card p-4 shadow-sm border-0 h-100 text-center">
+<i class="bi bi-box-seam fs-1 text-success"></i>
+<h6 class="fw-bold mt-2">My Orders</h6>
+<a href="/user/my-orders" class="btn btn-success w-100">Track Orders</a>
+</div>
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

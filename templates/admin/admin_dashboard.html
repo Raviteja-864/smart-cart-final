@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - SmartCart Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    
+    <!-- Top Greeting & Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-800">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-widest text-brand-400 bg-brand-500/20 px-3 py-1 rounded-full border border-brand-400/30">Store Analytics</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2">Welcome, {{ admin_name }}</h1>
+            <p class="text-xs text-slate-400 mt-1">SmartCart Store Command Center & Product Management Portal</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="/admin/add-item" class="bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-lg shadow-brand-500/30 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Product</span>
+            </a>
+            <a href="/admin/orders" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs px-4 py-3 rounded-xl border border-slate-700 transition-colors">
+                <i class="fa-solid fa-boxes-packing mr-1"></i> Orders Console
+            </a>
+            <a href="/admin-logout" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-semibold text-xs px-3.5 py-3 rounded-xl border border-rose-500/30 transition-colors">
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Analytics Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Total Revenue -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Revenue</span>
+                <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                </div>
+            </div>
+            <p class="text-2xl font-extrabold text-slate-900">₹{{ "{:,.0f}".format(total_revenue|float) }}</p>
+            <p class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-arrow-trend-up"></i> Lifetime Gross Earnings
+            </p>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Orders</span>
+                <div class="w-10 h-10 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-box-archive"></i>
+                </div>
+            </div>
+            <p class="text-2xl font-extrabold text-slate-900">{{ order_count }}</p>
+            <p class="text-[11px] text-slate-500 font-medium">Recorded Customer Purchases</p>
+        </div>
+
+        <!-- Total Products -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Products</span>
+                <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-cubes"></i>
+                </div>
+            </div>
+            <p class="text-2xl font-extrabold text-slate-900">{{ product_count }}</p>
+            <a href="/admin/item-list" class="text-[11px] text-brand-600 font-semibold hover:underline block">Manage Catalog &rarr;</a>
+        </div>
+
+        <!-- Pending Fulfillment -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Fulfillment</span>
+                <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                </div>
+            </div>
+            <p class="text-2xl font-extrabold text-slate-900">{{ pending_orders }}</p>
+            <p class="text-[11px] text-amber-600 font-semibold">Requires Dispatch Attention</p>
+        </div>
+
+    </div>
+
+    <!-- Recent Orders Fulfillment Table -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden p-6 sm:p-8 space-y-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900 tracking-tight">Recent Customer Orders</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Manage customer orders and update shipping fulfillment status</p>
+            </div>
+            <a href="/admin/orders" class="text-xs font-bold text-brand-600 hover:underline">View All Orders &rarr;</a>
+        </div>
+
+        {% if recent_orders %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase tracking-wider font-semibold">
+                            <th class="py-3 px-4">Order Ref</th>
+                            <th class="py-3 px-4">Customer</th>
+                            <th class="py-3 px-4">Amount</th>
+                            <th class="py-3 px-4">Payment</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4 text-right">Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                        {% for o in recent_orders %}
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="py-4 px-4 font-bold text-slate-900">{{ o.order_number or ('ORD-' ~ o.order_id) }}</td>
+                                <td class="py-4 px-4">
+                                    <span class="block font-semibold text-slate-900">{{ o.user_name or 'Customer' }}</span>
+                                    <span class="text-[11px] text-slate-400">{{ o.user_email or '' }}</span>
+                                </td>
+                                <td class="py-4 px-4 font-extrabold text-slate-900">₹{{ "{:,.0f}".format(o.total_amount) }}</td>
+                                <td class="py-4 px-4">
+                                    <span class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700">
+                                        {{ o.payment_method }} ({{ o.payment_status }})
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4">
+                                    {% if o.status == 'Placed' %}
+                                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">Placed</span>
+                                    {% elif o.status == 'Processing' %}
+                                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800">Processing</span>
+                                    {% elif o.status == 'Shipped' %}
+                                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800">Shipped</span>
+                                    {% elif o.status == 'Delivered' %}
+                                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">Delivered</span>
+                                    {% else %}
+                                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 px-4 text-right">
+                                    <form action="/admin/update-order-status/{{ o.order_id }}" method="POST" class="inline-flex items-center gap-2">
+                                        <select name="status" onchange="this.form.submit()" class="bg-slate-100 text-xs font-semibold rounded-lg px-2.5 py-1.5 border border-slate-200 focus:outline-none">
+                                            <option value="Placed" {% if o.status == 'Placed' %}selected{% endif %}>Placed</option>
+                                            <option value="Processing" {% if o.status == 'Processing' %}selected{% endif %}>Processing</option>
+                                            <option value="Shipped" {% if o.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                            <option value="Delivered" {% if o.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                            <option value="Cancelled" {% if o.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-xs text-slate-400 py-4">No recent orders recorded yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Product Catalog Quick Table -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Recent Products Inventory</h2>
+            <a href="/admin/item-list" class="text-xs font-bold text-brand-600 hover:underline">View All {{ product_count }} Items &rarr;</a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for p in products %}
+                <div class="flex items-center gap-4 p-3 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                    <img src="{{ p.image if p.image.startswith('http') else url_for('uploaded_file', filename=p.image) }}" 
+                         alt="{{ p.name }}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0"
+                         onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'">
+                    <div class="flex-1 min-w-0">
+                        <span class="text-[10px] font-bold text-brand-600 uppercase">{{ p.category }}</span>
+                        <h4 class="text-xs font-bold text-slate-900 truncate">{{ p.name }}</h4>
+                        <span class="text-xs font-extrabold text-slate-900">₹{{ "{:,.0f}".format(p.price) }}</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <a href="/admin/update-item/{{ p.product_id }}" class="p-1.5 text-xs text-slate-500 hover:text-brand-600"><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a href="/admin/delete-item/{{ p.product_id }}" onclick="return confirm('Delete product?');" class="p-1.5 text-xs text-slate-500 hover:text-rose-600"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

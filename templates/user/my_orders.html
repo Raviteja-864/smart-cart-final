@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - SmartCart{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">My Orders History</h1>
+            <p class="text-xs text-slate-500 mt-1">Track current order statuses, payment modes, and delivery history</p>
+        </div>
+        <a href="/user/products" class="bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md transition-colors">
+            + Shop More
+        </a>
+    </div>
+
+    {% if orders %}
+        <div class="space-y-6">
+            {% for o in orders %}
+                <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden transition-all hover:shadow-md">
+                    
+                    <!-- Header Bar -->
+                    <div class="bg-slate-50 p-4 sm:p-6 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4 text-xs">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div>
+                                <span class="text-slate-400 block text-[11px]">Order Code</span>
+                                <span class="font-extrabold text-slate-900">{{ o.order_number or ('ORD-' ~ o.order_id) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[11px]">Date Placed</span>
+                                <span class="font-bold text-slate-700">{{ (o.created_at|string)[:10] if o.created_at else 'Recent' }}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[11px]">Total Amount</span>
+                                <span class="font-extrabold text-brand-600">₹{{ "{:,.0f}".format(o.total_amount|float) }}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[11px]">Payment</span>
+                                <span class="font-semibold text-slate-700">{{ o.payment_method or 'COD' }} ({{ o.payment_status or 'Pending' }})</span>
+                            </div>
+                        </div>
+
+                        <!-- Status Badge -->
+                        <div class="flex items-center gap-3">
+                            {% if o.status == 'Placed' %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                    <i class="fa-solid fa-clock mr-1"></i> Placed
+                                </span>
+                            {% elif o.status == 'Processing' %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">
+                                    <i class="fa-solid fa-box-open mr-1"></i> Processing
+                                </span>
+                            {% elif o.status == 'Shipped' %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                    <i class="fa-solid fa-truck mr-1"></i> Shipped
+                                </span>
+                            {% elif o.status == 'Delivered' %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                    <i class="fa-solid fa-circle-check mr-1"></i> Delivered
+                                </span>
+                            {% else %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                                    <i class="fa-solid fa-xmark mr-1"></i> Cancelled
+                                </span>
+                            {% endif %}
+
+                            {% if o.status in ('Placed', 'Processing') %}
+                                <a href="/user/cancel_order/{{ o.order_id }}" onclick="return confirm('Are you sure you want to cancel this order?');" class="text-rose-600 hover:text-rose-800 text-xs font-semibold px-2.5 py-1 rounded-lg hover:bg-rose-50 border border-rose-200">
+                                    Cancel Order
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Items Body -->
+                    <div class="p-4 sm:p-6 divide-y divide-slate-100">
+                        {% if o.order_items %}
+                            {% for item in o.order_items %}
+                                <div class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="{{ item.image if item.image and item.image.startswith('http') else url_for('uploaded_file', filename=item.image or 'default.jpg') }}" 
+                                             alt="{{ item.name }}" class="w-14 h-14 object-cover rounded-xl border border-slate-200"
+                                             onerror="this.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'">
+                                        <div>
+                                            <h4 class="text-sm font-bold text-slate-900">{{ item.name }}</h4>
+                                            <span class="text-xs text-slate-500">Qty: {{ item.quantity }} &times; ₹{{ "{:,.0f}".format(item.price|float) }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-extrabold text-slate-900">₹{{ "{:,.0f}".format((item.price|float) * (item.quantity|int)) }}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-xs text-slate-400">Order details processed.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Address Footer -->
+                    <div class="bg-slate-50/50 p-4 border-t border-slate-100 text-xs text-slate-500 flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-brand-600"></i>
+                        <span><strong>Shipping Destination:</strong> {{ o.address or 'Standard Delivery Address' }}</span>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty Orders -->
+        <div class="bg-white rounded-3xl p-12 text-center border border-slate-200 max-w-md mx-auto my-12 space-y-4">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 text-2xl mx-auto">
+                <i class="fa-solid fa-box font-bold"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900">No Orders Yet</h3>
+            <p class="text-xs text-slate-500">You haven't placed any orders with SmartCart yet.</p>
+            <a href="/user/products" class="inline-block bg-brand-600 text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-md">
+                Browse Products
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
